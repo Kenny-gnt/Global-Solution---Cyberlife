@@ -60,59 +60,65 @@ A interface do CyberLife possui identidade visual futurista, com tons escuros, d
 
 Visão geral dos indicadores e informações de acompanhamento territorial.
 
-\<p align="center">
-&#x20; \<img src="lib/assets/images/screenshots/Painel%20principal.png" width="280" alt="Painel principal"/>
-\</p>
+<p align="center">
+  <img src="lib/assets/images/screenshots/painel-principal.png" width="280" alt="Painel principal do CyberLife"/>
+</p>
 
 ### 4.2 Indicadores e impacto social
 
 Apresentação dos indicadores monitorados e informações de impacto social demonstrativo.
 
-\<p align="center">   \<img src="lib/assets/images/screenshots/Painel%20principal%202.png" width="280" alt="Indicadores e impacto social"/> \</p>
+<p align="center">
+  <img src="lib/assets/images/screenshots/painel-indicadores.png" width="280" alt="Indicadores e impacto social"/>
+</p>
 
 ### 4.3 Prioridades e últimos alertas
 
 Distribuição dos alertas por nível de prioridade e eventos recentes.
 
-\<p align="center">
-&#x20; \<img src="lib/assets/images/screenshots/Painel%20principal%203.png" width="280" alt="Prioridades e últimos alertas"/>
-\</p>
+<p align="center">
+  <img src="lib/assets/images/screenshots/painel-alertas.png" width="280" alt="Prioridades e últimos alertas"/>
+</p>
 
 ### 4.4 Mapa territorial
 
 Visualização geográfica dos territórios monitorados.
 
-\<p align="center">   \<img src="lib/assets/images/screenshots/Mapa%20territorial.png" width="280" alt="Mapa territorial"/> \</p>
+<p align="center">
+  <img src="lib/assets/images/screenshots/mapa-territorial.png" width="280" alt="Mapa territorial"/>
+</p>
 
 ### 4.5 Central de alertas
 
 Lista de alertas com classificação e informações para avaliação.
 
-\<p align="center">
-&#x20; \<img src="lib/assets/images/screenshots/Central%20de%20alertas.png" width="280" alt="Central de alertas"/>
-\</p>
+<p align="center">
+  <img src="lib/assets/images/screenshots/central-alertas.png" width="280" alt="Central de alertas"/>
+</p>
 
 ### 4.6 Detalhamento dos alertas
 
 Visualização detalhada de um alerta, com informações para apoiar a análise humana.
 
-\<p align="center">
-&#x20; \<img src="lib/assets/images/screenshots/Central%20de%20alertas%202.png" width="280" alt="Detalhamento dos alertas"/>
-\</p>
+<p align="center">
+  <img src="lib/assets/images/screenshots/detalhamento-alertas.png" width="280" alt="Detalhamento dos alertas"/>
+</p>
 
 ### 4.7 Registro de ocorrências
 
 Formulário para cadastro de ocorrências territoriais.
 
-\<p align="center">   \<img src="lib/assets/images/screenshots/Registro%20de%20ocorr%C3%AAncias.png" width="280" alt="Registro de ocorrências"/> \</p>
+<p align="center">
+  <img src="lib/assets/images/screenshots/registro-ocorrencias.png" width="280" alt="Registro de ocorrências"/>
+</p>
 
 ### 4.8 Perfil e configurações
 
 Área de perfil, notificações, privacidade e configurações do aplicativo.
 
-\<p align="center">
-&#x20; \<img src="lib/assets/images/screenshots/Perfil%20e%20configura%C3%A7%C3%B5es.png" width="280" alt="Perfil e configurações"/>
-\</p>
+<p align="center">
+  <img src="lib/assets/images/screenshots/perfil-configuracoes.png" width="280" alt="Perfil e configurações"/>
+</p>
 
 ## ⚙️ 5. Funcionalidades
 
