@@ -53,8 +53,6 @@ class _MapPageState extends State<MapPage> {
         .where((alert) => alert.territoryId == territoryId)
         .toList();
 
-    if (alerts.isEmpty) return AlertPriority.normal;
-
     const order = {
       AlertPriority.normal: 0,
       AlertPriority.attention: 1,
@@ -62,11 +60,165 @@ class _MapPageState extends State<MapPage> {
       AlertPriority.urgent: 3,
     };
 
-    alerts.sort(
-      (a, b) => order[b.priority]!.compareTo(order[a.priority]!),
-    );
+    AlertPriority priority = AlertPriority.normal;
 
-    return alerts.first.priority;
+    for (final alert in alerts) {
+      if (order[alert.priority]! > order[priority]!) {
+        priority = alert.priority;
+      }
+    }
+
+    return priority;
+  }
+
+  void _showTerritoryDetails(
+    BuildContext context,
+    dynamic territory,
+    AppState appState,
+  ) {
+    final occurrences = appState.occurrences
+        .where((o) => o.territoryId == territory.id)
+        .toList();
+
+    final priority = _territoryPriority(territory.id, appState);
+    final color = _priorityColor(priority);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF101B29),
+      isScrollControlled: true,
+      builder: (context) => SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                territory.name,
+                style: const TextStyle(
+                  color: AppTheme.text,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                territory.region,
+                style: const TextStyle(color: AppTheme.muted),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Icon(Icons.circle, color: color, size: 12),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Prioridade territorial: ${_priorityLabel(priority)}',
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Índice de vegetação: ${territory.vegetationIndex}',
+                style: const TextStyle(color: AppTheme.text),
+              ),
+              const SizedBox(height: 22),
+              const Divider(color: AppTheme.line),
+              const SizedBox(height: 12),
+              Text(
+                'Ocorrências registradas (${occurrences.length})',
+                style: const TextStyle(
+                  color: AppTheme.cyan,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (occurrences.isEmpty)
+                const Text(
+                  'Nenhuma ocorrência registrada neste território.',
+                  style: TextStyle(color: AppTheme.muted),
+                )
+              else
+                ...occurrences.map(
+                  (occurrence) => Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(13),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppTheme.line),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                occurrence.type,
+                                style: const TextStyle(
+                                  color: AppTheme.text,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              occurrence.priority,
+                              style: TextStyle(
+                                color: _occurrencePriorityColor(
+                                  occurrence.priority,
+                                ),
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          occurrence.description,
+                          style: const TextStyle(
+                            color: AppTheme.muted,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          'Status: ${occurrence.status}',
+                          style: const TextStyle(
+                            color: AppTheme.cyan,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _occurrencePriorityColor(String priority) {
+    switch (priority.trim().toLowerCase()) {
+      case 'urgente':
+        return AppTheme.danger;
+      case 'crítico':
+      case 'critico':
+        return AppTheme.magenta;
+      case 'atenção':
+      case 'atencao':
+        return AppTheme.warning;
+      default:
+        return AppTheme.success;
+    }
   }
 
   Future<void> _goToMyLocation() async {
@@ -106,7 +258,11 @@ class _MapPageState extends State<MapPage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        SnackBar(
+          content: Text(
+            e.toString().replaceFirst('Exception: ', ''),
+          ),
+        ),
       );
     } finally {
       if (mounted) {
@@ -135,67 +291,58 @@ class _MapPageState extends State<MapPage> {
       final priority = _territoryPriority(territory.id, appState);
       final color = _priorityColor(priority);
 
+      final occurrenceCount = appState.occurrences
+          .where((o) => o.territoryId == territory.id)
+          .length;
+
       return Marker(
         point: LatLng(
           territory.latitude!,
           territory.longitude!,
         ),
-        width: 110,
-        height: 75,
+        width: 115,
+        height: 85,
         child: GestureDetector(
-          onTap: () {
-            showModalBottomSheet(
-              context: context,
-              backgroundColor: const Color(0xFF101B29),
-              builder: (context) => Padding(
-                padding: const EdgeInsets.all(22),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      territory.name,
-                      style: const TextStyle(
-                        color: AppTheme.text,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      territory.region,
-                      style: const TextStyle(color: AppTheme.muted),
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        Icon(Icons.circle, color: color, size: 12),
-                        const SizedBox(width: 8),
-                        Text(
-                          _priorityLabel(priority),
-                          style: TextStyle(
-                            color: color,
+          onTap: () => _showTerritoryDetails(
+            context,
+            territory,
+            appState,
+          ),
+          child: Column(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: color,
+                    size: 38,
+                  ),
+                  if (occurrenceCount > 0)
+                    Positioned(
+                      right: -9,
+                      top: -5,
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: AppTheme.cyan,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFF101B29),
+                            width: 2,
+                          ),
+                        ),
+                        child: Text(
+                          occurrenceCount.toString(),
+                          style: const TextStyle(
+                            color: Color(0xFF101B29),
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Índice de vegetação: ${territory.vegetationIndex}',
-                      style: const TextStyle(color: AppTheme.text),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-          child: Column(
-            children: [
-              Icon(
-                Icons.location_on,
-                color: color,
-                size: 38,
+                ],
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -237,7 +384,10 @@ class _MapPageState extends State<MapPage> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.my_location, color: AppTheme.cyan),
+                : const Icon(
+                    Icons.my_location,
+                    color: AppTheme.cyan,
+                  ),
           ),
         ],
       ),
@@ -257,8 +407,11 @@ class _MapPageState extends State<MapPage> {
             ),
             const SizedBox(height: 6),
             const Text(
-              'Visualização geográfica dos trechos monitorados',
-              style: TextStyle(color: AppTheme.muted, fontSize: 12),
+              'Visualização geográfica dos trechos monitorados e ocorrências',
+              style: TextStyle(
+                color: AppTheme.muted,
+                fontSize: 12,
+              ),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -344,7 +497,8 @@ class _MapPageState extends State<MapPage> {
             ),
             const SizedBox(height: 10),
             Text(
-              '${territories.length} trecho(s) com coordenadas cadastradas',
+              '${territories.length} trecho(s) com coordenadas cadastradas • '
+              '${appState.occurrences.length} ocorrência(s) registrada(s)',
               style: const TextStyle(
                 color: AppTheme.muted,
                 fontSize: 10,

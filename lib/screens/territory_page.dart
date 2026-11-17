@@ -117,7 +117,12 @@ class TerritoryPage extends StatelessWidget {
 
                 const SizedBox(height: 26),
 
-                PriorityPanel(alerts: alerts),
+                PriorityPanel(
+               urgent: appState.urgentCount,
+               critical: appState.criticalCount,
+               attention: appState.attentionCount,
+               normal: appState.normalCount,
+              ),
 
                 const SizedBox(height: 26),
 

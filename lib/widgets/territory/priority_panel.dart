@@ -1,48 +1,69 @@
-
 import 'package:flutter/material.dart';
 
-import '../../models/alert_model.dart';
 import '../../theme/app_theme.dart';
 import '../cyber_components.dart';
 
 class PriorityPanel extends StatelessWidget {
-  final List<AlertModel> alerts;
+  final int urgent;
+  final int critical;
+  final int attention;
+  final int normal;
 
   const PriorityPanel({
     super.key,
-    required this.alerts,
+    required this.urgent,
+    required this.critical,
+    required this.attention,
+    required this.normal,
   });
 
   @override
   Widget build(BuildContext context) {
-    final urgent = alerts.where((a) => a.priority == AlertPriority.urgent).length;
-    final critical = alerts.where((a) => a.priority == AlertPriority.critical).length;
-    final attention = alerts.where((a) => a.priority == AlertPriority.attention).length;
-    final normal = alerts.where((a) => a.priority == AlertPriority.normal).length;
+    final total = urgent + critical + attention + normal;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionTitle(
           title: 'Nível de prioridade',
-          subtitle: 'Distribuição dos alertas identificados',
+          subtitle: 'Distribuição dos alertas e ocorrências identificados',
         ),
         const SizedBox(height: 14),
         CyberPanel(
-          child: alerts.isEmpty
+          child: total == 0
               ? const Text(
-                  'Nenhum alerta identificado.',
+                  'Nenhum alerta ou ocorrência identificado.',
                   style: TextStyle(color: AppTheme.muted),
                 )
               : Column(
                   children: [
-                    _priorityRow('Urgente', urgent, AppTheme.danger),
+                    _priorityRow(
+                      'Urgente',
+                      urgent,
+                      total,
+                      AppTheme.danger,
+                    ),
                     const SizedBox(height: 17),
-                    _priorityRow('Crítico', critical, AppTheme.magenta),
+                    _priorityRow(
+                      'Crítico',
+                      critical,
+                      total,
+                      AppTheme.magenta,
+                    ),
                     const SizedBox(height: 17),
-                    _priorityRow('Atenção', attention, AppTheme.warning),
+                    _priorityRow(
+                      'Atenção',
+                      attention,
+                      total,
+                      AppTheme.warning,
+                    ),
                     const SizedBox(height: 17),
-                    _priorityRow('Normal', normal, AppTheme.success),
+                    _priorityRow(
+                      'Normal',
+                      normal,
+                      total,
+                      AppTheme.success,
+                    ),
                   ],
                 ),
         ),
@@ -50,8 +71,13 @@ class PriorityPanel extends StatelessWidget {
     );
   }
 
-  Widget _priorityRow(String title, int quantity, Color color) {
-    final progress = alerts.isEmpty ? 0.0 : quantity / alerts.length;
+  Widget _priorityRow(
+    String title,
+    int quantity,
+    int total,
+    Color color,
+  ) {
+    final progress = total == 0 ? 0.0 : quantity / total;
 
     return Column(
       children: [
