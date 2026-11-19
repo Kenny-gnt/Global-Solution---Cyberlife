@@ -117,7 +117,7 @@ Formulário para cadastro de ocorrências territoriais.
 Área de perfil, notificações, privacidade e configurações do aplicativo.
 
 <p align="center">
-  <img src="lib/assets/images/screenshots/perfil-configuracoes.png" width="280" alt="Perfil e configurações"/>
+  <img src="lib/assets/images/screenshots/perfil%20e%20configura%C3%A7%C3%B5es.png" width="280" alt="Perfil e configurações do CyberLife"/>
 </p>
 
 ## ⚙️ 5. Funcionalidades
