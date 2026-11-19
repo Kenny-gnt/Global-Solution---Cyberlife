@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
+
 import '../models/alert_model.dart';
 import '../models/occurrence_model.dart';
 import '../models/territory_model.dart';
+import '../models/team_model.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
 import '../services/notification_service.dart';
@@ -17,6 +19,7 @@ class AppState extends ChangeNotifier {
   List<TerritoryModel> territories = [];
   List<AlertModel> alerts = [];
   List<OccurrenceModel> occurrences = [];
+  List<TeamModel> teams = [];
 
   bool notificationsEnabled = true;
   bool urgentNotifications = true;
@@ -27,8 +30,8 @@ class AppState extends ChangeNotifier {
   int get territoryCount => territories.length;
   int get alertCount => alerts.length;
   int get occurrenceCount => occurrences.length;
+  int get teamCount => teams.length;
 
-  // Soma alertas territoriais e ocorrências manuais.
   int get urgentCount =>
       alerts.where((a) => a.priority == AlertPriority.urgent).length +
       occurrences.where((o) => o.priority.trim().toLowerCase() == 'urgente').length;
@@ -52,20 +55,18 @@ class AppState extends ChangeNotifier {
 
     try {
       occurrences = await _storageService.loadOccurrences();
+      teams = await _storageService.loadTeams();
 
       notificationsEnabled =
           await _storageService.loadNotificationsEnabled();
-
       urgentNotifications =
           await _storageService.loadUrgentEnabled();
-
       criticalNotifications =
           await _storageService.loadCriticalEnabled();
 
       territories = await _apiService.fetchTerritories();
 
       _generateAlerts();
-
       status = AppStatus.success;
     } catch (e) {
       errorMessage = 'Erro ao carregar os dados: $e';
@@ -75,12 +76,28 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // CADASTRO DE EQUIPES
+  Future<bool> addTeam(TeamModel team) async {
+    if (teams.any((t) => t.id == team.id)) return false;
+
+    teams = [team, ...teams];
+    await _storageService.saveTeams(teams);
+    notifyListeners();
+    return true;
+  }
+
+  Future<void> removeTeam(String id) async {
+    teams = teams.where((team) => team.id != id).toList();
+    await _storageService.saveTeams(teams);
+    notifyListeners();
+  }
+
+  // ALERTAS
   void _generateAlerts() {
     final List<AlertModel> generated = [];
 
     for (final territory in territories) {
       final value = territory.vegetationIndex;
-
       final AlertPriority priority;
 
       if (value >= 50) {
@@ -106,8 +123,7 @@ class AppState extends ChangeNotifier {
           evidence: 'Índice demonstrativo de vegetação: $value.',
           confidence: 0,
           limitation:
-              'Dados sintéticos para demonstração. '
-              'A classificação exige validação humana.',
+              'Dados sintéticos para demonstração. A classificação exige validação humana.',
           createdAt: DateTime.now(),
         ),
       );
@@ -116,22 +132,16 @@ class AppState extends ChangeNotifier {
     alerts = generated;
   }
 
+  // OCORRÊNCIAS
   Future<bool> addOccurrence(OccurrenceModel occurrence) async {
     final territoryExists =
         territories.any((t) => t.id == occurrence.territoryId);
 
-    if (!territoryExists) {
-      return false;
-    }
-
-    if (occurrences.any((o) => o.id == occurrence.id)) {
-      return false;
-    }
+    if (!territoryExists) return false;
+    if (occurrences.any((o) => o.id == occurrence.id)) return false;
 
     occurrences = [occurrence, ...occurrences];
-
     await _storageService.saveOccurrences(occurrences);
-
     notifyListeners();
 
     final priority = occurrence.priority.toLowerCase();
@@ -148,9 +158,7 @@ class AppState extends ChangeNotifier {
               '${occurrence.type}: '
               '${findTerritory(occurrence.territoryId)?.name ?? 'Trecho'}',
         );
-      } catch (_) {
-        // A ocorrência permanece salva mesmo se a notificação falhar.
-      }
+      } catch (_) {}
     }
 
     return true;
@@ -158,20 +166,13 @@ class AppState extends ChangeNotifier {
 
   Future<void> removeOccurrence(String id) async {
     occurrences = occurrences.where((o) => o.id != id).toList();
-
     await _storageService.saveOccurrences(occurrences);
-
     notifyListeners();
   }
 
-  Future<void> updateOccurrenceStatus(
-    String id,
-    String newStatus,
-  ) async {
+  Future<void> updateOccurrenceStatus(String id, String newStatus) async {
     occurrences = occurrences.map((occurrence) {
-      if (occurrence.id != id) {
-        return occurrence;
-      }
+      if (occurrence.id != id) return occurrence;
 
       return OccurrenceModel(
         id: occurrence.id,
@@ -187,10 +188,10 @@ class AppState extends ChangeNotifier {
     }).toList();
 
     await _storageService.saveOccurrences(occurrences);
-
     notifyListeners();
   }
 
+  // CONFIGURAÇÕES DE NOTIFICAÇÕES
   Future<void> updateNotificationSettings({
     bool? enabled,
     bool? urgent,
@@ -213,7 +214,6 @@ class AppState extends ChangeNotifier {
     for (final territory in territories) {
       if (territory.id == id) return territory;
     }
-
     return null;
   }
 
@@ -221,7 +221,6 @@ class AppState extends ChangeNotifier {
     for (final alert in alerts) {
       if (alert.id == id) return alert;
     }
-
     return null;
   }
 }

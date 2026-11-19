@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
@@ -6,6 +5,7 @@ import '../widgets/cyber_components.dart';
 import '../widgets/profile/profile_option.dart';
 import '../widgets/profile/cyberlife_animated_logo.dart';
 
+import 'teams_page.dart';
 import 'profile/notification_settings_page.dart';
 import 'profile/security_page.dart';
 import 'profile/about_cyberlife_page.dart';
@@ -58,6 +58,20 @@ class ProfilePage extends StatelessWidget {
               child: Column(
                 children: [
                   ProfileOption(
+                    icon: Icons.groups_outlined,
+                    title: 'Equipes',
+                    subtitle: 'Cadastrar e gerenciar equipes operacionais',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const TeamsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(color: AppTheme.line),
+                  ProfileOption(
                     icon: Icons.notifications_active_outlined,
                     title: 'Notificações',
                     subtitle: 'Configure os alertas do sistema',
@@ -65,8 +79,7 @@ class ProfilePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              const NotificationSettingsPage(),
+                          builder: (_) => const NotificationSettingsPage(),
                         ),
                       );
                     },

@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/occurrence_model.dart';
+import '../models/team_model.dart';
 
 class StorageService {
   static const String _occurrencesKey = 'cyberlife_occurrences';
+  static const String _teamsKey = 'cyberlife_teams';
   static const String _notificationsKey = 'cyberlife_notifications_enabled';
   static const String _urgentKey = 'cyberlife_urgent_enabled';
   static const String _criticalKey = 'cyberlife_critical_enabled';
@@ -14,37 +16,52 @@ class StorageService {
     final preferences = await SharedPreferences.getInstance();
     final storedData = preferences.getString(_occurrencesKey);
 
-    if (storedData == null || storedData.isEmpty) {
-      return [];
-    }
+    if (storedData == null || storedData.isEmpty) return [];
 
     try {
       final List<dynamic> decoded = jsonDecode(storedData);
-
       return decoded
-          .map(
-            (item) => OccurrenceModel.fromJson(
-              Map<String, dynamic>.from(item),
-            ),
-          )
+          .map((item) => OccurrenceModel.fromJson(
+                Map<String, dynamic>.from(item),
+              ))
           .toList();
     } catch (_) {
       return [];
     }
   }
 
-  Future<void> saveOccurrences(
-    List<OccurrenceModel> occurrences,
-  ) async {
+  Future<void> saveOccurrences(List<OccurrenceModel> occurrences) async {
     final preferences = await SharedPreferences.getInstance();
-
-    final encoded = jsonEncode(
-      occurrences.map((item) => item.toJson()).toList(),
-    );
-
+    final encoded = jsonEncode(occurrences.map((item) => item.toJson()).toList());
     await preferences.setString(_occurrencesKey, encoded);
   }
 
+  // EQUIPES
+  Future<List<TeamModel>> loadTeams() async {
+    final preferences = await SharedPreferences.getInstance();
+    final storedData = preferences.getString(_teamsKey);
+
+    if (storedData == null || storedData.isEmpty) return [];
+
+    try {
+      final List<dynamic> decoded = jsonDecode(storedData);
+      return decoded
+          .map((item) => TeamModel.fromJson(
+                Map<String, dynamic>.from(item),
+              ))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> saveTeams(List<TeamModel> teams) async {
+    final preferences = await SharedPreferences.getInstance();
+    final encoded = jsonEncode(teams.map((team) => team.toJson()).toList());
+    await preferences.setString(_teamsKey, encoded);
+  }
+
+  // NOTIFICAÇÕES
   Future<bool> loadNotificationsEnabled() async {
     final preferences = await SharedPreferences.getInstance();
     return preferences.getBool(_notificationsKey) ?? true;
@@ -66,7 +83,6 @@ class StorageService {
     required bool critical,
   }) async {
     final preferences = await SharedPreferences.getInstance();
-
     await preferences.setBool(_notificationsKey, enabled);
     await preferences.setBool(_urgentKey, urgent);
     await preferences.setBool(_criticalKey, critical);

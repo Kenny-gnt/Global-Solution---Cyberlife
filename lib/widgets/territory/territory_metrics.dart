@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../cyber_components.dart';
@@ -7,12 +6,14 @@ class TerritoryMetrics extends StatelessWidget {
   final int territories;
   final int alerts;
   final int occurrences;
+  final int teams;
 
   const TerritoryMetrics({
     super.key,
     required this.territories,
     required this.alerts,
     required this.occurrences,
+    required this.teams,
   });
 
   @override
@@ -58,8 +59,10 @@ class TerritoryMetrics extends StatelessWidget {
             Expanded(
               child: MetricCard(
                 title: 'Equipes',
-                value: '--',
-                description: 'Sem cadastro',
+                value: teams.toString().padLeft(2, '0'),
+                description: teams == 0
+                    ? 'Sem cadastro'
+                    : 'Cadastradas',
                 icon: Icons.groups_outlined,
                 color: AppTheme.success,
               ),

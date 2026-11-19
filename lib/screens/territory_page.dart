@@ -31,7 +31,8 @@ class TerritoryPage extends StatelessWidget {
         body: _StatusMessage(
           icon: Icons.cloud_off_outlined,
           title: 'Não foi possível carregar os dados',
-          message: appState.errorMessage ?? 'Verifique sua conexão e tente novamente.',
+          message: appState.errorMessage ??
+              'Verifique sua conexão e tente novamente.',
           buttonText: 'Tentar novamente',
           onPressed: () => appState.initialize(),
         ),
@@ -109,6 +110,7 @@ class TerritoryPage extends StatelessWidget {
                   territories: territories.length,
                   alerts: alerts.length,
                   occurrences: occurrences.length,
+                  teams: appState.teamCount,
                 ),
 
                 const SizedBox(height: 26),
@@ -118,11 +120,11 @@ class TerritoryPage extends StatelessWidget {
                 const SizedBox(height: 26),
 
                 PriorityPanel(
-               urgent: appState.urgentCount,
-               critical: appState.criticalCount,
-               attention: appState.attentionCount,
-               normal: appState.normalCount,
-              ),
+                  urgent: appState.urgentCount,
+                  critical: appState.criticalCount,
+                  attention: appState.attentionCount,
+                  normal: appState.normalCount,
+                ),
 
                 const SizedBox(height: 26),
 
