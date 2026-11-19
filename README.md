@@ -338,7 +338,7 @@ flutter analyze
 
 A demonstração apresenta a navegação da aplicação, os dashboards territoriais, o mapa, o funcionamento dos alertas, o registro de ocorrências e as configurações disponíveis.
 
-**Vídeo:** [Demonstração do CyberLife]
+**Vídeo:** https://youtu.be/uTn-6GnYLJw?is=PHhLxLsOE8rQ_gI2
 
 ## 📚 12. Contexto acadêmico
 
